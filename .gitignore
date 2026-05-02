@@ -42,11 +42,11 @@ runs/g1_max_speed/checkpoints/**
 !g1_run/checkpoints/**/*.mp4
 !g1_run/checkpoints/.gitkeep
 
-# Ignore scalar plots from training runs
-g1_run/logs/rsl_rl/g1_flat_train/**/scalar_plots/
+# Ignore scalar plots from training runs (any experiment name under rsl_rl)
+g1_run/logs/rsl_rl/**/scalar_plots/
 
 # Ignore exported inference artifacts under training runs
-g1_run/logs/rsl_rl/g1_flat_train/**/exported/
+g1_run/logs/rsl_rl/**/exported/
 
 # Hydra / run metadata outputs
 g1_run/outputs/

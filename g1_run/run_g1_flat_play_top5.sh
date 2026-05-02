@@ -18,16 +18,16 @@ SEED="${SEED:-42}"
 PLAY_VIDEO_LENGTH="${PLAY_VIDEO_LENGTH:-600}"
 HEADLESS="${HEADLESS:-1}"
 
-RUN_DIR="${RUN_DIR:-${REPO_ROOT}/g1_run/logs/rsl_rl/g1_flat_train/2026-05-02_15-57-10_baseline}"
+RUN_DIR="${RUN_DIR:-${REPO_ROOT}/g1_run/logs/rsl_rl/g1_flat_sprint_resume/2026-05-02_17-47-28_from1450_speedup}"
 PLAY_VIDEO_DIR="${RUN_DIR}/videos/play"
 ARCHIVE_DIR="${RUN_DIR}/videos/play_top5"
 
 CHECKPOINTS=(
-  "model_2050.pt"
-  "model_1950.pt"
-  "model_1800.pt"
-  "model_1600.pt"
-  "model_1450.pt"
+  "model_2450.pt"
+  "model_2400.pt"
+  "model_2500.pt"
+  "model_2300.pt"
+  "model_2200.pt"
 )
 
 if [[ ! -d "${RUN_DIR}" ]]; then
