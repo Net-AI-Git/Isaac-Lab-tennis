@@ -3,8 +3,8 @@ set -euo pipefail
 
 # Run IsaacLab play sequentially on selected top checkpoints.
 # Usage:
-#   /workspace/Isaac-Lab-tennis/scripts/run_g1_flat_play_top5.sh
-#   PLAY_VIDEO_LENGTH=600 HEADLESS=1 /workspace/Isaac-Lab-tennis/scripts/run_g1_flat_play_top5.sh
+#   /workspace/Isaac-Lab-tennis/scripts/run_rsl_g1_flat_play_top5.sh
+#   PLAY_VIDEO_LENGTH=600 HEADLESS=1 /workspace/Isaac-Lab-tennis/scripts/run_rsl_g1_flat_play_top5.sh
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
@@ -65,7 +65,7 @@ for ckpt in "${CHECKPOINTS[@]}"; do
     headless_flag="--headless"
   fi
 
-  "${ISAACLAB_ROOT}/isaaclab.sh" -p "${SCRIPT_DIR}/launch_rsl_flat_play.py" \
+  "${ISAACLAB_ROOT}/isaaclab.sh" -p "${SCRIPT_DIR}/launch_rsl_g1_flat_play.py" \
     --task "${TASK}" \
     --checkpoint "${ckpt_path}" \
     --num_envs "${NUM_ENVS}" \

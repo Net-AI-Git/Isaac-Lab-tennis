@@ -9,15 +9,15 @@ ISAACLAB_ROOT="${ISAACLAB_ROOT:-/workspace/IsaacLab}"
 ISAACLAB_ENV="${ISAACLAB_ENV:-/workspace/env_isaaclab}"
 
 # Defaults (can be overridden from CLI):
-#   NUM_ENVS=4096 MAX_ITERATIONS=5000 RUN_NAME=my_run ./run_g1_flat_train.sh
-#   VIDEO_INTERVAL=1000 VIDEO_LENGTH=300 ./run_g1_flat_train.sh
+#   NUM_ENVS=4096 MAX_ITERATIONS=5000 RUN_NAME=my_run ./run_rsl_g1_flat_train.sh
+#   VIDEO_INTERVAL=1000 VIDEO_LENGTH=300 ./run_rsl_g1_flat_train.sh
 #   RESUME=1 LOAD_RUN=g1_run_vel_1ms CHECKPOINT=model_1450.pt \
-#   EXPERIMENT_NAME=g1_flat_sprint_resume RUN_NAME=from1450_speedup ./run_g1_flat_train.sh
+#   EXPERIMENT_NAME=g1_flat_sprint_resume RUN_NAME=from1450_speedup ./run_rsl_g1_flat_train.sh
 # Resume from a checkpoint anywhere on disk (copies into IsaacLab log tree for RSL-RL):
 #   RESUME=1 CHECKPOINT_SRC="${RUN_DIR}/checkpoints/g1_flat/g1_run_vel_2ms/model_2450.pt" \
-#   EXPERIMENT_NAME=g1_flat_vel6_resume RUN_NAME=from2450_vel6 ./run_g1_flat_train.sh
+#   EXPERIMENT_NAME=g1_flat_vel6_resume RUN_NAME=from2450_vel6 ./run_rsl_g1_flat_train.sh
 # Train from scratch (no --resume) with high command speed already set in flat_env_cfg.py:
-#   RESUME=0 EXPERIMENT_NAME=g1_flat_vel6_scratch RUN_NAME=baseline ./run_g1_flat_train.sh
+#   RESUME=0 EXPERIMENT_NAME=g1_flat_vel6_scratch RUN_NAME=baseline ./run_rsl_g1_flat_train.sh
 TASK="${TASK:-Isaac-Velocity-Flat-G1-Tennis-v0}"
 EXPERIMENT_NAME="${EXPERIMENT_NAME:-g1_flat_train}"
 RUN_NAME="${RUN_NAME:-baseline}"
@@ -80,7 +80,7 @@ if [[ "${RESUME}" == "1" ]]; then
 fi
 
 # Use launcher so ``g1_run`` is imported and ``...-Tennis-v0`` maps to this repo's flat_env_cfg.
-"${ISAACLAB_ROOT}/isaaclab.sh" -p "${RUN_DIR}/launch_rsl_flat_train.py" \
+"${ISAACLAB_ROOT}/isaaclab.sh" -p "${RUN_DIR}/launch_rsl_g1_flat_train.py" \
   --task "${TASK}" \
   --num_envs "${NUM_ENVS}" \
   --max_iterations "${MAX_ITERATIONS}" \

@@ -35,8 +35,10 @@ gym.register(
 )
 
 
+# Flat G1 (this repo): use distinct Gym ids so they are not shadowed by
+# ``isaaclab_tasks``'s ``Isaac-Velocity-Flat-G1-v0`` when only that package is imported.
 gym.register(
-    id="Isaac-Velocity-Flat-G1-v0",
+    id="Isaac-Velocity-Flat-G1-Tennis-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
@@ -48,7 +50,7 @@ gym.register(
 
 
 gym.register(
-    id="Isaac-Velocity-Flat-G1-Play-v0",
+    id="Isaac-Velocity-Flat-G1-Tennis-Play-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     disable_env_checker=True,
     kwargs={
