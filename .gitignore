@@ -27,7 +27,26 @@ env_isaaclab/
 Thumbs.db
 *.log
 
+# Model/video artifacts: ignore everywhere by default
+*.pt
+*.mp4
+
 # Training outputs (dedicated run workspace)
 runs/g1_max_speed/logs/
 runs/g1_max_speed/checkpoints/**
 !runs/g1_max_speed/checkpoints/.gitkeep
+
+# Allow model/video artifacts only under g1_run/checkpoints
+!g1_run/checkpoints/
+!g1_run/checkpoints/**/*.pt
+!g1_run/checkpoints/**/*.mp4
+!g1_run/checkpoints/.gitkeep
+
+# Ignore scalar plots from training runs
+g1_run/logs/rsl_rl/g1_flat_train/**/scalar_plots/
+
+# Ignore exported inference artifacts under training runs
+g1_run/logs/rsl_rl/g1_flat_train/**/exported/
+
+# Hydra / run metadata outputs
+g1_run/outputs/
