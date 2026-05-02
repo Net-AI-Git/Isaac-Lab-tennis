@@ -26,3 +26,8 @@ env_isaaclab/
 .DS_Store
 Thumbs.db
 *.log
+
+# Training outputs (dedicated run workspace)
+runs/g1_max_speed/logs/
+runs/g1_max_speed/checkpoints/**
+!runs/g1_max_speed/checkpoints/.gitkeep
