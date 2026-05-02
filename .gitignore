@@ -1,0 +1,28 @@
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.sample
+GitHub/.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.pytest_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+env_isaaclab/
+
+# Editor / IDE
+.vscode/
+.idea/
+
+# OS / logs
+.DS_Store
+Thumbs.db
+*.log
