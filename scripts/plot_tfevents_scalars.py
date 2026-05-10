@@ -8,10 +8,16 @@ Dependencies: pip install tensorboard matplotlib
 
   python3 plot_tfevents_scalars.py --events path/to/events.out.tfevents.XXX
 
-Default output is a *sibling* of the run folder: <parent>/<run_name>_tfevents_plots
-Never put --out inside the logdir: TensorBoard scans that directory, and extra
-subfolders (e.g. an old tfevents_plots/) can break loading.
-If you intentionally need this behavior, pass --allow-out-inside-logdir.
+Default output is a fixed subfolder inside the resolved log/run directory:
+  <logdir>/tfevents_scalar_plots/
+
+Each scalar is saved as one PNG named after its tag (sanitized); existing PNGs with
+the same names are overwritten so you can rerun the script to refresh plots.
+
+Note: Putting files under logdir may affect TensorBoard in some setups. If Reload()
+fails, pass --events to the explicit tfevents file and remove stray folders under
+that logdir, or set --out to a path outside the logdir via --allow-out-inside-logdir
+when overriding.
 
 For --events with a file path, a single-file copy is read from a small temp
 directory (prefix "plot_"; do not use "tfevents" in the temp dir name — TensorBoard
@@ -41,9 +47,12 @@ _ISOLATED_TMP_PARENT = Path(
     os.environ.get("PLOT_TFEvents_TMP", str(Path(__file__).resolve().parent / ".cache" / "tfevents_isolated"))
 )
 
+# Fixed directory name inside <logdir> for default PNG export (same place as events).
+SCALAR_PLOTS_SUBDIR = "tfevents_scalar_plots"
+
 
 def _default_outdir(logdir: Path) -> Path:
-    return (logdir.parent / f"{logdir.name}_tfevents_plots").resolve()
+    return (logdir / SCALAR_PLOTS_SUBDIR).resolve()
 
 
 def _outdir_inside_logdir(logdir: Path, outdir: Path) -> bool:
@@ -100,7 +109,7 @@ def main() -> None:
         "--out",
         type=str,
         default=None,
-        help="Output directory (default: sibling <run_name>_tfevents_plots; not inside --logdir)",
+        help=f"Output directory (default: <logdir>/{SCALAR_PLOTS_SUBDIR})",
     )
     parser.add_argument(
         "--list-tags",
@@ -119,14 +128,18 @@ def main() -> None:
         print(f"Not a directory: {logdir}", file=sys.stderr)
         sys.exit(1)
 
-    outdir = (
-        Path(args.out).resolve() if args.out else _default_outdir(logdir)
-    )
-    if not args.list_tags and _outdir_inside_logdir(logdir, outdir) and not args.allow_out_inside_logdir:
+    outdir = Path(args.out).resolve() if args.out else _default_outdir(logdir)
+    use_default_inside_logdir = args.out is None
+    if (
+        not args.list_tags
+        and _outdir_inside_logdir(logdir, outdir)
+        and not use_default_inside_logdir
+        and not args.allow_out_inside_logdir
+    ):
         print(
-            "Error: --out cannot be inside the log directory (breaks TensorBoard). "
-            "Omit --out for the default sibling folder, use a path outside the logdir, "
-            "or pass --allow-out-inside-logdir if you understand the risk.",
+            "Error: explicit --out cannot be inside the log directory (can break TensorBoard). "
+            "Omit --out to use <logdir>/tfevents_scalar_plots, choose a path outside the logdir, "
+            "or pass --allow-out-inside-logdir.",
             file=sys.stderr,
         )
         sys.exit(3)
@@ -193,11 +206,6 @@ def main() -> None:
 
             fname = _sanitize_filename(tag) + ".png"
             fpath = outdir / fname
-            if fpath.exists():
-                stem, i = fpath.stem, 1
-                while fpath.exists():
-                    fpath = outdir / f"{stem}_{i}.png"
-                    i += 1
             fig.savefig(fpath)
             plt.close(fig)
             print(f"  wrote {fpath.name}  ({len(steps)} points)")

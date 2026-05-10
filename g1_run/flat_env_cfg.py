@@ -3,6 +3,8 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 
+import os
+
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.utils import configclass
 
@@ -44,18 +46,15 @@ class G1FlatEnvCfg(G1RoughEnvCfg):
 
 class G1FlatEnvCfg_PLAY(G1FlatEnvCfg):
     def __post_init__(self) -> None:
-        # post init of parent
         super().__post_init__()
-
-        # make a smaller scene for play
         self.scene.num_envs = 50
         self.scene.env_spacing = 2.5
-        # disable randomization for play
         self.observations.policy.enable_corruption = False
-        # remove random pushing
         self.events.base_external_force_torque = None
         self.events.push_robot = None
-        # play inference at fixed forward speed of 1.0 m/s
-        self.commands.base_velocity.ranges.lin_vel_x = (1.0, 1.0)
-        self.commands.base_velocity.ranges.lin_vel_y = (0.0, 0.0)
-        self.commands.base_velocity.ranges.ang_vel_z = (0.0, 0.0)
+        vx = float(os.environ.get("G1_PLAY_LIN_VEL_X", "1.0"))
+        vy = float(os.environ.get("G1_PLAY_LIN_VEL_Y", "0.0"))
+        wz = float(os.environ.get("G1_PLAY_ANG_VEL_Z", "0.0"))
+        self.commands.base_velocity.ranges.lin_vel_x = (vx, vx)
+        self.commands.base_velocity.ranges.lin_vel_y = (vy, vy)
+        self.commands.base_velocity.ranges.ang_vel_z = (wz, wz)
