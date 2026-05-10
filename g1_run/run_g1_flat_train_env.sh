@@ -35,6 +35,10 @@ fi
 export ACCEPT_EULA="${ACCEPT_EULA:-Y}"
 export OMNI_KIT_ACCEPT_EULA="${OMNI_KIT_ACCEPT_EULA:-yes}"
 
+# Venv was created with Python 3.11 (see env_isaaclab/pyvenv.cfg); lib/.../site-packages is 3.11.
+# If bin/python was repointed to /usr/bin/python3 (3.10), imports break. Pin to system 3.11.
+ln -sf /usr/bin/python3.11 "${ISAACLAB_ENV}/bin/python"
+
 # shellcheck source=/dev/null
 source "${ISAACLAB_ENV}/bin/activate"
 
