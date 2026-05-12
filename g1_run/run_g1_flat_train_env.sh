@@ -35,25 +35,80 @@ fi
 export ACCEPT_EULA="${ACCEPT_EULA:-Y}"
 export OMNI_KIT_ACCEPT_EULA="${OMNI_KIT_ACCEPT_EULA:-yes}"
 
-# Venv was created with Python 3.11 (see env_isaaclab/pyvenv.cfg); lib/.../site-packages is 3.11.
-# If bin/python was repointed to /usr/bin/python3 (3.10), imports break. Pin to system 3.11.
-ln -sf /usr/bin/python3.11 "${ISAACLAB_ENV}/bin/python"
+_python_is_311() {
+  local python_bin="$1"
+  [[ -x "${python_bin}" ]] || return 1
+  "${python_bin}" - <<'PY' >/dev/null 2>&1
+import sys
+raise SystemExit(0 if sys.version_info[:2] == (3, 11) else 1)
+PY
+}
+
+_resolve_python_311() {
+  local candidate=""
+  local resolved=""
+
+  candidate="${ISAACLAB_ENV}/bin/python"
+  resolved="$(readlink -f "${candidate}" 2>/dev/null || true)"
+  if [[ -n "${resolved}" ]] && _python_is_311 "${resolved}"; then
+    printf '%s\n' "${resolved}"
+    return 0
+  fi
+
+  if [[ -f "${ISAACLAB_ENV}/pyvenv.cfg" ]]; then
+    candidate="$(awk -F' = ' '$1 == "home" { print $2; exit }' "${ISAACLAB_ENV}/pyvenv.cfg")"
+    candidate="${candidate%/}/python3.11"
+    if _python_is_311 "${candidate}"; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  fi
+
+  candidate="$(command -v python3.11 2>/dev/null || true)"
+  if [[ -n "${candidate}" ]] && _python_is_311 "${candidate}"; then
+    printf '%s\n' "${candidate}"
+    return 0
+  fi
+
+  if command -v uv >/dev/null 2>&1; then
+    candidate="$(uv python find 3.11 2>/dev/null || true)"
+    if [[ -n "${candidate}" ]] && _python_is_311 "${candidate}"; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
+PYTHON_BIN="$(_resolve_python_311)" || {
+  echo "[ERROR] Could not find a valid Python 3.11 executable for ${ISAACLAB_ENV}." >&2
+  echo "        Recreate the venv with: uv venv --python 3.11 --seed \"${ISAACLAB_ENV}\"" >&2
+  return 1
+}
+
+# Venv packages live under lib/python3.11, so bin/python must resolve to Python 3.11.
+ln -sfn "${PYTHON_BIN}" "${ISAACLAB_ENV}/bin/python"
 
 # shellcheck source=/dev/null
 source "${ISAACLAB_ENV}/bin/activate"
+hash -r
 
 # Optional extra args, e.g. --resume --load_run ... --checkpoint ...
 g1_flat_train_launch() {
-  "${ISAACLAB_ROOT}/isaaclab.sh" -p "${RUN_DIR}/launch_rsl_flat_train.py" \
-    --task "${TASK}" \
-    --num_envs "${NUM_ENVS}" \
-    --max_iterations "${MAX_ITERATIONS}" \
-    --experiment_name "${EXPERIMENT_NAME}" \
-    --run_name "${RUN_NAME}" \
-    --seed "${SEED}" \
-    --video \
-    --video_length "${VIDEO_LENGTH}" \
-    --video_interval "${VIDEO_INTERVAL}" \
-    "$@" \
-    --headless
+  (
+    cd "${RUN_DIR}"
+    "${ISAACLAB_ROOT}/isaaclab.sh" -p "${RUN_DIR}/launch_rsl_flat_train.py" \
+      --task "${TASK}" \
+      --num_envs "${NUM_ENVS}" \
+      --max_iterations "${MAX_ITERATIONS}" \
+      --experiment_name "${EXPERIMENT_NAME}" \
+      --run_name "${RUN_NAME}" \
+      --seed "${SEED}" \
+      --video \
+      --video_length "${VIDEO_LENGTH}" \
+      --video_interval "${VIDEO_INTERVAL}" \
+      "$@" \
+      --headless
+  )
 }

@@ -39,7 +39,7 @@ class G1FlatEnvCfg(G1RoughEnvCfg):
         )
         # Commands — forward speed command range (m/s).
         # Random targets are drawn uniformly in this interval.
-        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 1.0)
+        self.commands.base_velocity.ranges.lin_vel_x = (0.0, 3.0)
         self.commands.base_velocity.ranges.lin_vel_y = (-0.5, 0.5)
         self.commands.base_velocity.ranges.ang_vel_z = (-1.0, 1.0)
 
